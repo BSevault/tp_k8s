@@ -1,6 +1,8 @@
+![Kubernetes logo](https://github.com/cncf/artwork/blob/main/projects/kubernetes/icon/color/kubernetes-icon-color.png)
+
 # TP K8s
 
-Iinstaller minikube
+Installer minikube
 
 Pour se mettre dans le docker de minikube dans un terminal:\
 `eval $(minikube docker-env)`
