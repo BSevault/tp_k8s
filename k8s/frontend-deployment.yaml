@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+  name: frontend
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: frontend
+
+  template:
+    metadata:
+      labels:
+        app: frontend
+
+      annotations:
+        kubernetes.io/change-cause: "Updated to latest frontend version"
+
+    spec:
+      containers:
+      - name: frontend
+        image: tp_k8s_frontend:v1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5001
+        env:
+        - name: BACKEND_URL
+          value: "http://backend-service:5000"

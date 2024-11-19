@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Frontend Service with Mitosis Simulation</title>
+    <!-- Inclusion de la bibliothèque p5.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <!-- Inclusion du style CSS -->
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+        canvas {
+            display: block;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff; /* Fond blanc */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        .lava-lamp {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            z-index: -1;
+        }
+        .container {
+            background-color: #f0f2f5; /* Couleur de fond légère pour le conteneur */
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            z-index: 1;
+        }
+        h1 {
+            color: #007bff;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #333333;
+            font-weight: 400;
+            font-size: 1.1em;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: 700;
+        }
+        .button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .button:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+        }
+        .button:active {
+            transform: translateY(1px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Conteneur pour la simulation de mitose -->
+    <div class="lava-lamp" id="mitosisCanvasContainer"></div>
+    <!-- Conteneur pour le message du backend -->
+    <div class="container">
+        <h1>Frontend Service</h1>
+        <p class="{{ 'error' if 'Error' in message else '' }}">{{ message }}</p>
+        <button class="button" onclick="window.location.reload();">Rafraîchir</button>
+    </div>
+
+    <!-- Inclusion du code cell.js -->
+    <script>
+    class Cell {
+      constructor(x, y, r) {
+        this.x = x;
+        this.y = y;
+        this.r = r; // radius of cell
+        this.dir = random(0, 2 * PI); // direction (in polar coordinates angle)
+        this.speed = random(0.8 * speed, 1.2 * speed); // slightly randomizes speed to make cells look more organic
+        this.growthRate = random(0.8 * growthRate, 1.2 * growthRate);  // slightly randomizes growth rate to make cells look more organic
+        this.splitting = false;
+      }
+
+      // draws cell
+      draw() {
+        push();
+        translate(this.x, this.y);
+        fill(0, 0, 0);
+        noStroke();
+        let d = this.r * 2; // ellipse uses diameter
+        ellipse(0, 0, d, d);
+        if (this.r > fullyGrownRadius * 0.9 && !this.splitting) {
+          let opacity = map(this.r, 0.9 * fullyGrownRadius, fullyGrownRadius, 0, 255);
+          fill(255, 0, 0, opacity);
+          ellipse(0, 0, d, d);
+        }
+        pop();
+      }
+
+      // moves cell #trigonometry
+      move() {
+        // speed = polar radius = hypotenuse
+        this.revDir();
+        this.x += this.speed * cos(this.dir);
+        this.y += this.speed * sin(this.dir);
+      }
+
+      grow() {
+        if (this.r < fullyGrownRadius && !this.splitting) {
+          this.r += this.growthRate;
+        }
+        if (this.splitting) {
+          this.r -= this.growthRate * 5;
+          if(this.r < fullyGrownRadius * 0.55){
+            this.splitting = false;
+          }
+        }
+      }
+
+      // reverse direction of cell #polarCoordinates
+      revDir() {
+        // if cell has reached left or right edge, mirror direction in x
+        if (this.x - this.r < 0 || this.x + this.r > width) {
+          // reverse direction
+          if (this.dir < PI / 2) {
+            this.dir += ((PI / 2) - this.dir) * 2;
+          } else if (this.dir < PI) {
+            this.dir = PI - this.dir;
+          } else if (this.dir < (3 * PI) / 2) {
+            this.dir += ((((3 * PI) / 2) - this.dir) * 2);
+          } else if (this.dir <= 2 * PI) {
+            this.dir -= 2 * (this.dir - ((3 * PI) / 2));
+          }
+        }
+        // if cell has reached top or bottom, mirror direction in y
+        if (this.y - this.r < 0 || this.y + this.r > height) {
+          // reverse direction
+          if (this.dir < PI / 2) {
+            this.dir = (2 * PI) - this.dir;
+          } else if (this.dir < PI) {
+            this.dir += 2 * (PI - this.dir);
+          } else if (this.dir < (3 * PI) / 2) {
+            this.dir -= 2 * (this.dir - PI);
+          } else if (this.dir <= 2 * PI) {
+            this.dir = (2 * PI) - this.dir;
+          }
+        }
+      }
+
+      // returns true if mouse is currently hovered over this cell
+      isHovered() {
+        return dist(mouseX, mouseY, this.x, this.y) < this.r;
+      }
+    }
+    </script>
+
+    <!-- Inclusion du code sketch.js -->
+    <script>
+    // Title: Coding Challenge #6 - Mitosis
+    // Author: Daniel Kaye
+    //  URL: http://dnkaye.com/2020_CodingChallenges.html
+    //
+    // Based on Daniel Schiffman's (Coding Train) coding challenges
+    //  URL: https://thecodingtrain.com/CodingChallenges/006-mitosis-p5.html
+    //
+    // What is this?
+    //  An attempt to simulate cell mitosis, in some sense
+    //
+    // How do I do this?
+    //  I attempt to complete Daniel Schiffman's coding challenges before watching
+    //  his video, then afterwards I watch and see what he did differently, and learn!
+
+    // Things I'm proud of / differences from The Coding Train version:
+    //  -using polar coordinates (angle) to set and change directions of travel of particles (cells)
+    //  -mitosis triggered by max size OR mouse press
+    //  -reversal of direction at screen edges using trig
+    //  -shrinking animation of cell during mitosis, sorta looks like they're actually splitting off from each other
+
+    let cells = []; // array to hold all cells
+    let speed = 0.25; // approx speed at which cells move
+    let growthRate = 0.05; // approx growth rate for cells
+    let fullyGrownRadius = 25; // max size a cell will grow too before splitting
+    let maxNumOfCells = 1000; // program resets when there are more than 1000 cells (prevents crashing)
+
+    function setup() {
+      let canvas = createCanvas(windowWidth / 2, windowHeight);
+      canvas.parent('mitosisCanvasContainer');
+      cells.push(new Cell(width / 2, height / 2, fullyGrownRadius * 0.75)); // creates first cell
+    }
+
+    function draw() {
+      if (focused || frameCount < 30) {
+        background(255);
+        drawCells(); // draws, moves, and grows all cells
+        // resets cells if there are too many (prevents crashing, sometimes)
+        if (cells.length > maxNumOfCells) {
+          resetCells();
+        }
+        drawNumOfCells(); // writes current number of cells to the screen
+      } else {
+        drawUnpauseInstructions();
+      }
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth / 2, windowHeight);
+    }
+
+    function drawUnpauseInstructions(){
+      noStroke();
+      fill(0);
+      textAlign(CENTER);
+      textSize(18);
+      text('click to activate', width/2, height - height/5);
+    }
+
+    // draws all cells in array
+    function drawCells() {
+      for (let cell of cells) { // for all cells....
+        cell.grow(); // incrementally grows each cell
+        cell.move(); // incrementally moves each cell
+        cell.draw(); // draws cell to screen
+        // cell starts mitosis if it's reached its fully grown size
+        if (cell.r >= fullyGrownRadius) { // if a cell has reached its maximum size....
+          mitosis(cell); // split that cell
+        }
+      }
+    }
+
+    function mousePressed() {
+      // if you click on a cell, start mitosis
+      for (let i = 0; i < cells.length; i++) {
+        if (cells[i].isHovered()) {
+          mitosis(cells[i]);
+          print('mitosis! ' + cells.length);
+          i = cells.length;
+        }
+      }
+    }
+
+    // makes a cell split in two
+    function mitosis(cell) {
+      cell.splitting = true;
+      let newDir = cell.dir + PI; // new direction = opposite direction of cell it's splitting off of
+      newDir += (random(0, PI / 2)); // slightly alters, randomizes new cell direction to make sketch appear slightly more organic
+      if (newDir > 2 * PI) {
+        newDir -= 2 * PI;
+      }
+      cells.push(new Cell(cell.x, cell.y, cell.r * 0.5));
+      cells[cells.length - 1].dir = newDir;
+    }
+
+    // clears array of cells, starts a new array with only one
+    function resetCells() {
+      cells = [];
+      cells.push(new Cell(width / 2, height / 2, fullyGrownRadius * 0.75)); // creates first cell
+    }
+
+    function drawNumOfCells() {
+      noStroke();
+      fill(192);
+      textSize(14);
+      textAlign(LEFT);
+      text('number of cells: ' + cells.length, 10, height - 10);
+    }
+    </script>
+</body>
+</html>
