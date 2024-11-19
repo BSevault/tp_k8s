@@ -1,6 +1,6 @@
 <p>
   <img src="https://github.com/cncf/artwork/blob/main/projects/kubernetes/icon/color/kubernetes-icon-color.png" alt="Kubernetes logo" style="width: 50px; vertical-align: middle; margin-right: 10px;">
-  <span style="font-size: 2em; font-weight: bold;">TP K8s</span>
+  <h1>TP K8s</h1>
 </p>
 
 Installer minikube
