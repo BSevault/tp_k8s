@@ -23,4 +23,6 @@ Pour appliquer les config kub:
 - `kubectl apply -f frontend-service.yaml`
 
 Obtenir l'URL du frontend avec Minikube:\
-`minikube service frontend-service --url`
+`minikube service frontend-service --url`\
+ou\
+`minikube service frontend-svc --url`
