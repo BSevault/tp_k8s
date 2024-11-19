@@ -8,44 +8,39 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <!-- Inclusion du style CSS -->
     <style>
-        html,
-        body {
+        html, body {
             margin: 0;
             padding: 0;
-        }
-
-        canvas {
-            display: block;
+            min-height: 100vh;
+            height: 100%;
+            overflow-y: auto;
+            font-family: 'Roboto', sans-serif;
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #ffffff;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            flex-direction: row;
+            background-color: #ffffff;
+        }
+
+        .simulation-container {
+            width: 50%;
             position: relative;
         }
 
-        .lava-lamp {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 50%;
+        #mitosisCanvasContainer {
+            width: 100%;
             height: 100%;
-            z-index: -1;
         }
 
         .main-container {
             display: flex;
-            justify-content: space-between;
-            gap: 20px;
-            width: 100%;
-            padding: 20px;
             flex-direction: column;
             align-items: center;
+            gap: 20px;
+            width: 50%;
+            padding: 20px;
+            overflow-y: auto;
         }
 
         .container {
@@ -55,34 +50,26 @@
             border: 2px solid #bbb;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
             text-align: center;
-            width: 30%;
+            width: 80%;
             max-width: 500px;
-            flex: 1;
         }
 
-        h1,
-        h2 {
+        h1, h2 {
             color: #007bff;
             font-weight: 700;
             margin-bottom: 10px;
         }
 
         p {
-            color: #333333;
-            font-weight: 400;
+            color: #333;
             font-size: 1.1em;
-        }
-
-        .error {
-            color: #dc3545;
-            font-weight: 700;
         }
 
         .button {
             margin-top: 20px;
             padding: 10px 20px;
             background-color: #007bff;
-            color: #ffffff;
+            color: #fff;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -102,9 +89,12 @@
 </head>
 
 <body>
-    <!-- Conteneur pour la simulation de mitose -->
-    <div class="lava-lamp" id="mitosisCanvasContainer"></div>
-    <!-- Conteneur principal pour aligner les conteneurs avec un espace entre eux -->
+    <!-- Conteneur pour la simulation de mitose dans la moitié gauche -->
+    <div class="simulation-container">
+        <div class="lava-lamp" id="mitosisCanvasContainer"></div>
+    </div>
+
+    <!-- Conteneur principal pour le contenu dans la moitié droite -->
     <div class="main-container">
         <div class="container">
             <h1>Frontend Service</h1>
@@ -112,20 +102,32 @@
         </div>
 
         <div class="container">
+            <h2>Backend Service 0</h2>
+            <p id="message0">No message yet.</p>
+            <button class="button" onclick="fetchMessage(5000, 'message0')">Get Message</button>
+        </div>
+
+        <div class="container">
             <h2>Backend Service 1</h2>
-            <p id="message">No message yet.</p>
-            <button class="button" onclick="fetchMessage()">Get Message</button>
+            <p id="message1">No message yet.</p>
+            <button class="button" onclick="fetchMessage(5001, 'message1')">Get Message</button>
+        </div>
+
+        <div class="container">
+            <h2>Backend Service 2</h2>
+            <p id="message2">No message yet.</p>
+            <button class="button" onclick="fetchMessage(5002, 'message2')">Get Message</button>
         </div>
     </div>
 
     <script>
-        function fetchMessage() {
-            fetch('/get_message')
+        function fetchMessage(param, elementId) {
+            fetch(`/get_message/${param}`)
                 .then(response => response.json())
                 .then(data => {
-                    const messageElement = document.getElementById('message');
+                    const messageElement = document.getElementById(elementId);
                     messageElement.textContent = data.message;
-                    if (messageElement.textContent.includes("Error")) {
+                    if (data.message.includes("Error")) {
                         messageElement.classList.add('error');
                     } else {
                         messageElement.classList.remove('error');
@@ -133,7 +135,7 @@
                 })
                 .catch(error => {
                     console.error('Error fetching message:', error);
-                    const messageElement = document.getElementById('message');
+                    const messageElement = document.getElementById(elementId);
                     messageElement.textContent = 'Error fetching message.';
                     messageElement.classList.add('error');
                 });
@@ -146,10 +148,10 @@
             constructor(x, y, r) {
                 this.x = x;
                 this.y = y;
-                this.r = r; // radius of cell
-                this.dir = random(0, 2 * PI); // direction (in polar coordinates angle)
-                this.speed = random(0.8 * speed, 1.2 * speed); // slightly randomizes speed to make cells look more organic
-                this.growthRate = random(0.8 * growthRate, 1.2 * growthRate);  // slightly randomizes growth rate to make cells look more organic
+                this.r = r;
+                this.dir = random(0, 2 * PI);
+                this.speed = random(0.8 * speed, 1.2 * speed);
+                this.growthRate = random(0.8 * growthRate, 1.2 * growthRate);
                 this.splitting = false;
             }
 
@@ -158,7 +160,7 @@
                 translate(this.x, this.y);
                 fill(0, 0, 0);
                 noStroke();
-                let d = this.r * 2; // ellipse uses diameter
+                let d = this.r * 2;
                 ellipse(0, 0, d, d);
                 if (this.r > fullyGrownRadius * 0.9 && !this.splitting) {
                     let opacity = map(this.r, 0.9 * fullyGrownRadius, fullyGrownRadius, 0, 255);

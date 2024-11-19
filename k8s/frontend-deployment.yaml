@@ -23,10 +23,14 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: tp_k8s_frontend:v1
+        image: frontend:v1
         imagePullPolicy: Never
         ports:
         - containerPort: 5000
         env:
-        - name: BACKEND_URL
-          value: "http://backend-service:5000"
+        - name: BACKEND0_URL
+          value: "http://backend-svc0:5000"
+        - name: BACKEND1_URL
+          value: "http://backend-svc1:5000"
+        - name: BACKEND2_URL
+          value: "http://backend-svc2:5000"
