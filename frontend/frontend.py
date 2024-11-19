@@ -11,8 +11,8 @@ def favicon():
 def home():
     try:
         # Appel au backend via le service Kubernetes
-        response = requests.get("http://backend-service:5000/api/data")
-        # response = requests.get("http://localhost:5000/api/data")
+        response = requests.get("http://backend-service:5000/api/data") # for kubernetes use
+        # response = requests.get("http://localhost:5000/api/data") # for local use
         data = response.json()
         message = data.get("message", "No message received from backend")
 
@@ -23,4 +23,5 @@ def home():
     return render_template("index.html", message=message)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    app.run(host="0.0.0.0", port=5000) # for kubernetes use
+    # app.run(host="0.0.0.0", port=5001) # for local use
