@@ -1,17 +1,23 @@
 # TP K8s
 
-install minikube
+Iinstaller minikube
 
-`eval $(minikube docker-env)` pour se mettre dans le docker de minikube dans un terminal
+Pour se mettre dans le docker de minikube dans un terminal:\
+`eval $(minikube docker-env)`
 
-`eval $(minikube docker-env -u)` pour unset
+Pour unset:\
+`eval $(minikube docker-env -u)`
 
-`docker images` pour voir où on est
+Pour voir où on est:\
+`docker images`
 
-`minikube start` pour démarrer minikube
+Pour démarrer minikube\
+`minikube start`
 
 Pour appliquer les config kub:
-
 - `kubectl apply -f backend-deployment.yaml`
 - `kubectl apply -f frontend-deployment.yaml`
 - `kubectl apply -f frontend-service.yaml`
+
+Obtenir l'URL du frontend avec Minikube:\
+`minikube service frontend-service --url`
