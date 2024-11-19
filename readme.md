@@ -2,9 +2,9 @@
 
 install minikube
 
-`eval $(minkube docker_env)` pour se mettre dans le docker de minikube dans un terminal
+`eval $(minikube docker-env)` pour se mettre dans le docker de minikube dans un terminal
 
-`eval $(minkube docker_env -u)` pour unset
+`eval $(minikube docker-env -u)` pour unset
 
 `docker images` pour voir où on est
 
