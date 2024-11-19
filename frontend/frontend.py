@@ -7,7 +7,7 @@ app = Flask(__name__)
 def get_message(param):
     try:
         # Appel au backend via le service Kubernetes
-        response = requests.get(f"http://backend-svc{param}:5000/api/data") # for kubernetes use
+        response = requests.get(f"http://backend{param}-svc:5000/api/data") # for kubernetes use
         # response = requests.get(f"http://localhost:{param}/api/data") # for local use
         data = response.json()
         message = data.get("message", "No message received from backend")

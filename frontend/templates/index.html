@@ -104,19 +104,31 @@
         <div class="container">
             <h2>Backend Service 0</h2>
             <p id="message0">No message yet.</p>
-            <button class="button" onclick="fetchMessage(5000, 'message0')">Get Message</button>
+            <!-- For local use -->
+            <!-- <button class="button" onclick="fetchMessage(5000, 'message0')">Get Message</button> -->
+
+            <!-- For k8s use -->
+            <button class="button" onclick="fetchMessage(0, 'message0')">Get Message</button>
         </div>
 
         <div class="container">
             <h2>Backend Service 1</h2>
             <p id="message1">No message yet.</p>
-            <button class="button" onclick="fetchMessage(5001, 'message1')">Get Message</button>
+            <!-- For local use -->
+            <!-- <button class="button" onclick="fetchMessage(5001, 'message1')">Get Message</button> -->
+
+            <!-- For k8s use -->
+            <button class="button" onclick="fetchMessage(1, 'message1')">Get Message</button>
         </div>
 
         <div class="container">
             <h2>Backend Service 2</h2>
             <p id="message2">No message yet.</p>
-            <button class="button" onclick="fetchMessage(5002, 'message2')">Get Message</button>
+            <!-- For local use -->
+            <!-- <button class="button" onclick="fetchMessage(5002, 'message2')">Get Message</button> -->
+
+            <!-- For k8s use -->
+            <button class="button" onclick="fetchMessage(2, 'message2')">Get Message</button>
         </div>
     </div>
 
