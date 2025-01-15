@@ -4,6 +4,9 @@ kind: Deployment
 
 metadata:
   name: frontend
+  labels:
+    global: tp
+    type: front
 
 spec:
   replicas: 1
